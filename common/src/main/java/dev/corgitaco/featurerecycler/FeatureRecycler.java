@@ -33,7 +33,7 @@ public class FeatureRecycler {
     }
 
 
-    public static <T extends Holder<Biome>> List<FeatureSorter.StepFeatureData> recycle(List<T> biomes, Function<T, List<HolderSet<PlacedFeature>>> toFeatueSetFunction) {
+    public static <T extends Holder<Biome>> List<FeatureSorter.StepFeatureData> recycle(List<T> biomes, Function<T, List<HolderSet<PlacedFeature>>> toFeatureSetFunction) {
         long startTime = System.currentTimeMillis();
         LOGGER.info("Starting feature recycler...");
 
@@ -47,7 +47,7 @@ public class FeatureRecycler {
         }
 
         for (T biome : biomes) {
-            List<HolderSet<PlacedFeature>> features = toFeatueSetFunction.apply(biome);
+            List<HolderSet<PlacedFeature>> features = toFeatureSetFunction.apply(biome).stream().distinct().toList();
 
             for (int i = 0; i < features.size(); i++) {
                 HolderSet<PlacedFeature> feature = features.get(i);
