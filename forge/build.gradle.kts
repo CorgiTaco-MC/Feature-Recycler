@@ -83,7 +83,7 @@ publisher {
 }
 
 private fun getPublishingCredentials(): Pair<String?, String?> {
-    val curseForgeToken = (project.findProperty("curseforge_token") ?: System.getenv("CURSEFORGE_TOKEN") ?: "") as String?
-    val modrinthToken = (project.findProperty("modrinth_token") ?: System.getenv("MODRINTH_TOKEN") ?: "") as String?
+    val curseForgeToken = (project.findProperty("curseforge_token") ?: System.getenv("CURSEFORGE_TOKEN") ?: System.getenv("CURSEFORGE_KEY") ?: "") as String?
+    val modrinthToken = (project.findProperty("modrinth_token") ?: System.getenv("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_KEY") ?: "") as String?
     return Pair(curseForgeToken, modrinthToken)
 }
