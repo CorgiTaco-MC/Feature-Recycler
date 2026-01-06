@@ -54,17 +54,15 @@ public class FeatureRecycler {
 
         List<Map<T, List<Holder<PlacedFeature>>>> biomeTracker = new ArrayList<>();
 
-        GenerationStep.Decoration[] values = GenerationStep.Decoration.values();
-        for (int i = 0; i < values.length; i++) {
-            biomeTracker.add(new Reference2ObjectLinkedOpenHashMap<>());
-        }
-
-
         for (T biome : biomes) {
-            List<HolderSet<PlacedFeature>> features = toFeatureSetFunction.apply(biome).stream().distinct().toList();
+            List<HolderSet<PlacedFeature>> features = toFeatureSetFunction.apply(biome);
 
             for (int featureStep = 0; featureStep < features.size(); featureStep++) {
                 HolderSet<PlacedFeature> feature = features.get(featureStep);
+
+                if (featureStep >= biomeTracker.size()) {
+                    biomeTracker.add(new Reference2ObjectLinkedOpenHashMap<>());
+                }
                 biomeTracker.get(featureStep).put(biome, new ArrayList<>(feature.stream().toList()));
             }
         }
