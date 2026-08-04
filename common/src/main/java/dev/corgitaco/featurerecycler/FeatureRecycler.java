@@ -5,7 +5,7 @@ import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectLinkedOpenHashMap;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.FeatureSorter;
 import net.minecraft.world.level.levelgen.GenerationStep;
@@ -109,11 +109,11 @@ public class FeatureRecycler {
                         }
                         if (currentFeatureIDX >= 0 && nextFeatureIDX >= 0) {
                             if (currentFeatureIDX > nextFeatureIDX) {
-                                ResourceLocation currentBiomeLocation = biome.unwrapKey().isEmpty() ? null : biome.unwrapKey().orElseThrow().location();
+                                Identifier currentBiomeLocation = biome.unwrapKey().isEmpty() ? null : biome.unwrapKey().orElseThrow().identifier();
                                 String currentBiomeName = currentBiomeLocation == null ? "???" : currentBiomeLocation.toString();
-                                String currentFeatureName = currentHolder.unwrapKey().isEmpty() ? "???" : currentHolder.unwrapKey().orElseThrow().location().toString();
-                                String nextFeatureName = nextHolder.unwrapKey().isEmpty() ? "???" : nextHolder.unwrapKey().orElseThrow().location().toString();
-                                ResourceLocation ruleSetterLocation = biomeRuleSetter.unwrapKey().isEmpty() ? null : biomeRuleSetter.unwrapKey().orElseThrow().location();
+                                String currentFeatureName = currentHolder.unwrapKey().isEmpty() ? "???" : currentHolder.unwrapKey().orElseThrow().identifier().toString();
+                                String nextFeatureName = nextHolder.unwrapKey().isEmpty() ? "???" : nextHolder.unwrapKey().orElseThrow().identifier().toString();
+                                Identifier ruleSetterLocation = biomeRuleSetter.unwrapKey().isEmpty() ? null : biomeRuleSetter.unwrapKey().orElseThrow().identifier();
                                 String biomeRuleSetterName = ruleSetterLocation == null ? "???" :  ruleSetterLocation.toString();
 
                                 LOGGER.warn("Moved placed feature \"%s\" from index %d to index %d for biome \"%s\". Placed Feature index rules set by biome \"%s\".".formatted(currentFeatureName, currentHolderIndex, nextHolderIndex, currentBiomeName, biomeRuleSetterName));

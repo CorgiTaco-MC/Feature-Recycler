@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[52,)"
+loaderVersion = "[64,)"
 issueTrackerURL = "https://github.com/CorgiTaco/Feature-Recycler/issues"
 license = "All Rights Reserved"
 
@@ -17,13 +17,13 @@ logoFile = "feature-recycler.png"
 [[dependencies.featurerecycler]]
 modId = "forge"
 mandatory = true
-versionRange = "[52,)"
+versionRange = "[64,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.featurerecycler]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.21.1]"
+versionRange = "[26.1,)"
 ordering = "NONE"
 side = "BOTH"

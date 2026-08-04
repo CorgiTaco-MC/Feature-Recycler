@@ -1,89 +1,68 @@
-import com.hypherionmc.modpublisher.properties.CurseEnvironment
-import com.hypherionmc.modpublisher.properties.ModLoader
-import com.hypherionmc.modpublisher.properties.ReleaseType
-
 plugins {
-    id("com.gradleup.shadow")
-    id("com.hypherionmc.modutils.modpublisher") version "2.+"
+    id("multiloader-loader")
+    id("java")
+    id("idea")
+    id("eclipse")
+    id("net.minecraftforge.gradle") version "[7.0.17,8)"
+    id("mod-publishing")
 }
 
-architectury {
-    platformSetupLoomIde()
-    forge()
+val forge_version: String by project
+val mod_id: String by project
+val minecraft_version: String by project
+val java_version: String by project
+
+val mixinConfigs = listOf("featurerecycler-common.mixins.json")
+
+java.toolchain.languageVersion.set(JavaLanguageVersion.of(java_version.toInt()))
+
+sourceSets.forEach {
+    val dir = layout.buildDirectory.dir("sourcesSets/${it.name}")
+    it.output.setResourcesDir(dir.get().asFile)
+    it.java.destinationDirectory = dir
 }
 
-val minecraftVersion = project.properties["minecraft_version"] as String
+minecraft {
+    runs {
+        configureEach {
+            workingDir = layout.projectDirectory.dir("run")
 
-configurations {
-    create("common")
-    "common" {
-        isCanBeResolved = true
-        isCanBeConsumed = false
-    }
-    create("shadowBundle")
-    compileClasspath.get().extendsFrom(configurations["common"])
-    runtimeClasspath.get().extendsFrom(configurations["common"])
-    getByName("developmentForge").extendsFrom(configurations["common"])
-    "shadowBundle" {
-        isCanBeResolved = true
-        isCanBeConsumed = false
+            systemProperty("eventbus.api.strictRuntimeChecks", "true")
+            systemProperty("forge.enabledGameTestNamespaces", mod_id)
+            mixinConfigs.forEach { config ->
+                args("--mixin.config=$config")
+            }
+        }
+
+        register("client")
+
+        register("server") {
+            args("--nogui")
+        }
     }
 }
 
-loom {
-    forge {
-        mixinConfig("featurerecycler-common.mixins.json")
-    }
+repositories {
+    minecraft.mavenizer(this)
+    maven(fg.forgeMaven)
+    maven(fg.minecraftLibsMaven)
+    mavenCentral()
 }
 
 dependencies {
-    forge("net.minecraftforge:forge:$minecraftVersion-${project.properties["forge_version"]}")
-
-    "common"(project(":common", "namedElements")) { isTransitive = false }
-    "shadowBundle"(project(":common", "transformProductionForge"))
+    implementation(minecraft.dependency("net.minecraftforge:forge:${minecraft_version}-${forge_version}"))
 }
 
-tasks {
-    processResources {
-        inputs.property("version", project.version)
+tasks.withType<JavaCompile>().configureEach {
+    options.encoding = "UTF-8"
+}
 
-        filesMatching("META-INF/mods.toml") {
-            expand(mapOf("version" to project.version))
-        }
-    }
-
-    shadowJar {
-        configurations = listOf(project.configurations.getByName("shadowBundle"))
-        archiveClassifier.set("dev-shadow")
-    }
-
-    remapJar {
-        inputFile.set(shadowJar.get().archiveFile)
-        dependsOn(shadowJar)
+tasks.named<Jar>("jar") {
+    manifest {
+        attributes["MixinConfigs"] = mixinConfigs.joinToString(",")
     }
 }
 
-publisher {
-    apiKeys {
-        curseforge(getPublishingCredentials().first)
-        modrinth(getPublishingCredentials().second)
-    }
-
-    curseID.set("1077985")
-    modrinthID.set("IAzu52kG")
-    setReleaseType(ReleaseType.RELEASE)
-    projectVersion.set(project.version.toString() + "-${project.name}")
-    displayName.set(base.archivesName.get() + "-${project.version}")
-    changelog.set(projectDir.toPath().parent.resolve("CHANGELOG.md").toFile().readText())
-    artifact.set(tasks.remapJar)
-    setGameVersions(minecraftVersion)
-    setLoaders(ModLoader.FORGE)
-    setCurseEnvironment(CurseEnvironment.SERVER)
-    setJavaVersions(JavaVersion.VERSION_21, JavaVersion.VERSION_22)
-}
-
-private fun getPublishingCredentials(): Pair<String?, String?> {
-    val curseForgeToken = (project.findProperty("curseforge_token") ?: System.getenv("CURSEFORGE_TOKEN") ?: System.getenv("CURSEFORGE_KEY") ?: "") as String?
-    val modrinthToken = (project.findProperty("modrinth_token") ?: System.getenv("MODRINTH_TOKEN") ?: System.getenv("MODRINTH_KEY") ?: "") as String?
-    return Pair(curseForgeToken, modrinthToken)
+configurations.configureEach {
+    resolutionStrategy.force("net.sf.jopt-simple:jopt-simple:5.0.4")
 }
