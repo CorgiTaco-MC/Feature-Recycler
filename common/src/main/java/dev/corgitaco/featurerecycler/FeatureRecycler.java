@@ -47,11 +47,11 @@ public class FeatureRecycler {
         }
 
         for (T biome : biomes) {
-            List<HolderSet<PlacedFeature>> features = toFeatureSetFunction.apply(biome).stream().distinct().toList();
+            List<HolderSet<PlacedFeature>> features = toFeatureSetFunction.apply(biome);
 
             for (int i = 0; i < features.size(); i++) {
                 HolderSet<PlacedFeature> feature = features.get(i);
-                biomeTracker.get(i).put(biome, new ArrayList<>(feature.stream().toList()));
+                biomeTracker.get(i).put(biome, new ArrayList<>(feature.stream().distinct().toList()));
             }
         }
 
